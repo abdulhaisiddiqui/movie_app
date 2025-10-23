@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:myapp/core/utils/validators.dart';
 import 'package:myapp/views/screens/Home/home_screen.dart';
 import 'package:myapp/views/screens/Login_Signup/login_screen.dart';
+import 'package:myapp/core/utils/validators.dart';
+
+import '../core/errors/firebase_error_mapper.dart';
 
 class FirebaseAuthService extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -12,23 +16,10 @@ class FirebaseAuthService extends ChangeNotifier {
   bool get isLoading => _isLoading;
 
   Future<void> signUp({required String username, required String email, required String password, required String cnfPassword, required BuildContext context,}) async {
-    if (username.isEmpty || email.isEmpty || password.isEmpty || cnfPassword.isEmpty) {
-      _showSnackBar(context, "All fields are required.");
-      return;
-    }
+    final passwordError = Validators.validatePassword(username, email, password, cnfPassword);
 
-    if (!email.contains("@")) {
-      _showSnackBar(context, "Please enter a valid email address.");
-      return;
-    }
-
-    if (password.length < 6) {
-      _showSnackBar(context, "Password must be at least 6 characters long.");
-      return;
-    }
-
-    if (password != cnfPassword) {
-      _showSnackBar(context, "Passwords do not match.");
+    if(passwordError != null){
+      _showSnackBar(context, passwordError);
       return;
     }
 
@@ -52,21 +43,7 @@ class FirebaseAuthService extends ChangeNotifier {
       Navigator.pop(context); // or navigate to Dashboard/HomeScreen
     } on FirebaseAuthException catch (e) {
 
-      String errorMessage = "";
-
-      switch (e.code) {
-        case "email-already-in-use":
-          errorMessage = "This email is already registered.";
-          break;
-        case "invalid-email":
-          errorMessage = "Invalid email format.";
-          break;
-        case "weak-password":
-          errorMessage = "Your password is too weak.";
-          break;
-        default:
-          errorMessage = "Signup failed. Please try again.";
-      }
+      final errorMessage = FirebaseErrorMapper.getMessage(e.code);
 
       _showSnackBar(context, errorMessage);
     } catch (e) {
@@ -95,9 +72,10 @@ class FirebaseAuthService extends ChangeNotifier {
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen()));
       _showSnackBar(context, 'Login in Successfully.');
     } on FirebaseAuthException catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: ${e.message}"), backgroundColor: Colors.red),
-      );
+      final errorMessage = SigninValidators.getErrorMessage(e.code);
+
+        _showSnackBar(context, errorMessage);
+
     } catch (e) {
       print("Login error: $e");
     }

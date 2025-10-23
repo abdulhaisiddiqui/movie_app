@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/services/firebase_auth_service.dart';
-import 'package:myapp/views/screens/Login_Signup/signUp_screen.dart';
-import 'package:myapp/views/widgets/UiHelper.dart';
+import 'package:myapp/views/screens/Login_Signup/signup_screen.dart';
+import 'package:myapp/core/widgets/UiHelper.dart';
 import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -10,7 +10,6 @@ class LoginScreen extends StatefulWidget {
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
-
 class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
@@ -24,7 +23,6 @@ class _LoginScreenState extends State<LoginScreen> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // 🔹 Background Movie Collage
           Container(
             width: double.infinity,
             height: double.infinity,
@@ -65,7 +63,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(30),
 
-                    // 🔹 Subtle shadow for depth
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.6),
@@ -75,7 +72,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ],
 
-                    // 🔹 Transparent gradient
                     gradient: LinearGradient(
                       colors: [
                         const Color(0xFF2E0069).withOpacity(0.55), // top purple
@@ -178,7 +174,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     shadowColor: WidgetStateProperty.all(Colors.transparent),
                                   ),
                                   onPressed: isLoading
-                                      ? null // Disable button while loading
+                                      ? null
                                       : () async {
                                     setState(() => isLoading = true);
 

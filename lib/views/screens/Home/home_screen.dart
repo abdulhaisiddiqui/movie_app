@@ -4,6 +4,9 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:myapp/models/show_model.dart' hide Image;
 import 'package:myapp/services/api_service.dart';
 import 'package:myapp/services/firebase_auth_service.dart';
+import 'package:myapp/viewmodels/providers/show_provider.dart';
+import 'package:myapp/views/screens/specific/specific_screen.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -13,7 +16,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _selectedNavIndex = 0;
   int _carouselIndex = 0;
 
   List<ShowModel> shows = [];
@@ -43,21 +45,26 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    loadShows();
-  }
-
-  Future<void> loadShows() async {
-    final data = await ApiService.fetchShows();
-    setState(() {
-      shows = data;
-      isLoading = false;
+    Future.microtask(() {
+      context.read<ShowProvider>().fetchShows();
     });
   }
+
+  // Future<void> loadShows() async {
+  //   final data = await ApiService.fetchShows();
+  //   setState(() {
+  //     shows = data;
+  //     isLoading = false;
+  //   });
+  // }
 
   final authVM = FirebaseAuthService();
 
   @override
   Widget build(BuildContext context) {
+
+    final showProvider = context.watch<ShowProvider>();
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
@@ -83,30 +90,49 @@ class _HomeScreenState extends State<HomeScreen> {
 
               const SizedBox(height: 20),
 
-              Container(
-                height: 45,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade900,
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                child: const TextField(
-                  style: TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.search, color: Colors.grey),
-                    hintText: "Search movie..",
-                    hintStyle: TextStyle(color: Colors.grey),
-                    border: InputBorder.none,
+            // final provider = context.watch<ShowProvider>();
+
+// Search bar
+//         TextField(
+//         onChanged: provider.searchShows,
+//         decoration: const InputDecoration(
+//           hintText: "Search shows...",
+//         ),
+//       ),
+
+// List
+
+
+            Column(
+              children: [
+                Container(
+                  height: 45,
+                  margin: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade900,
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  child: TextField(
+                    onChanged: showProvider.searchShows,
+                    style: const TextStyle(color: Colors.white),
+                    decoration: const InputDecoration(
+                      prefixIcon: Icon(Icons.search, color: Colors.grey),
+                      hintText: "Search movie...",
+                      hintStyle: TextStyle(color: Colors.grey),
+                      border: InputBorder.none,
+                    ),
                   ),
                 ),
-              ),
+
+              ],
+            ),
               const SizedBox(height: 20),
 
-              // 🔹 Category Tabs
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildTab("All", false),
-                  _buildTab("Movies", true),
+                  _buildTab("All", true),
+                  _buildTab("Movies", false),
                   _buildTab("TV Shows", false),
                   _buildTab("Web Series", false),
                 ],
@@ -116,89 +142,87 @@ class _HomeScreenState extends State<HomeScreen> {
               _buildChips(categories),
               const SizedBox(height: 20),
 
-              CarouselSlider(
+              showProvider.isLoading
+              ? const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(20),
+                  child:
+                  CircularProgressIndicator(color: Colors.purpleAccent),
+                ),
+              )
+              : CarouselSlider(
                 options: CarouselOptions(
                   height: 200,
                   autoPlay: true,
                   viewportFraction: 0.8,
                   enlargeCenterPage: true,
-                  onPageChanged: (index, reason) {
-                    setState(() {
-                      _carouselIndex = index;
-                    });
-                  },
+
                 ),
 
-                items: shows.isEmpty
+                // items: shows.take(5).map((show){
+                //   final imageUrl = show.show?.image?.medium ?? '';
+                //   final title = show.show?.name ?? 'Unknown';
+                //   return GestureDetector(
+                //     onTap: (){
+                //       Navigator.push(context, MaterialPageRoute( builder: (_) => SpecificScreen(show: show),))
+                //     },
+                //   )
+                // }),
+
+                items: showProvider.shows.isEmpty
                     ? [
                   const Center(
                     child: CircularProgressIndicator(color: Colors.purpleAccent),
                   )
                 ]
-                    : shows.map((show) {
+                    :
+                showProvider.shows.map((show) {
                   final imageUrl = show.show?.image?.medium ?? '';
                   final title = show.show?.name ?? 'Unknown';
 
-                  return ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        imageUrl.isNotEmpty
-                            ? Image.network(
-                          imageUrl,
-                          fit: BoxFit.cover,
-                        )
-                            : Container(
-                          color: Colors.grey.shade800,
-                          child: const Center(
-                            child: Icon(
-                              Icons.movie,
-                              color: Colors.white,
-                              size: 40,
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => SpecificScreen(show: show)),
+                      );
+                    },
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          imageUrl.isNotEmpty
+                              ? Image.network(imageUrl, fit: BoxFit.cover)
+                              : Image.asset('assets/images/movieimage.png', fit: BoxFit.cover),
+                          Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [Colors.black.withOpacity(0.6), Colors.transparent],
+                                begin: Alignment.bottomCenter,
+                                end: Alignment.topCenter,
+                              ),
                             ),
                           ),
-                        ),
-
-                        // 🔹 Gradient Overlay
-                        Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.black.withOpacity(0.6),
-                                Colors.transparent,
-                              ],
-                              begin: Alignment.bottomCenter,
-                              end: Alignment.topCenter,
+                          Positioned(
+                            bottom: 12,
+                            left: 12,
+                            right: 12,
+                            child: Text(
+                              title,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
-                        ),
-
-                        // 🔹 Movie Title
-                        Positioned(
-                          bottom: 12,
-                          left: 12,
-                          right: 12,
-                          child: Text(
-                            title,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              shadows: [
-                                Shadow(
-                                  color: Colors.black,
-                                  offset: Offset(1, 1),
-                                  blurRadius: 6,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   );
                 }).toList(),
+
               ),
 
               const SizedBox(height: 10),
@@ -233,7 +257,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: 12),
 
-              isLoading
+              showProvider.isLoading
                   ? const Center(
                 child: Padding(
                   padding: EdgeInsets.all(20),
@@ -241,59 +265,53 @@ class _HomeScreenState extends State<HomeScreen> {
                   CircularProgressIndicator(color: Colors.purpleAccent),
                 ),
               )
-                  : GridView.builder(
-                itemCount: shows.length,
+                  :
+              GridView.builder(
+                itemCount: showProvider.shows.length,
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                gridDelegate:
-                const SliverGridDelegateWithFixedCrossAxisCount(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   mainAxisSpacing: 12,
                   crossAxisSpacing: 12,
                   childAspectRatio: 0.7,
                 ),
                 itemBuilder: (context, index) {
-                  final show = shows[index];
-                  return Container(
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade900,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.8),
-                          offset: const Offset(4, 6),
-                          blurRadius: 10,
+                  final show = showProvider.shows[index];
+                  final imageUrl = show.show?.image?.medium ?? '';
+
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => SpecificScreen(show: show),
                         ),
-                      ],
-                    ),
-
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Builder(
-                        builder: (context) {
-                          final imageUrl = shows[index].show?.image?.medium ?? '';
-
-                          if (imageUrl.isNotEmpty) {
-                            return Image.network(
-                              imageUrl,
-                              fit: BoxFit.cover,
-                            );
-                          } else {
-                            return const Center(
-                              child: Icon(
-                                Icons.movie,
-                                size: 50,
-                                color: Colors.white,
-                              ),
-                            );
-                          }
-                        },
+                      );
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade900,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.8),
+                            offset: const Offset(4, 6),
+                            blurRadius: 10,
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: imageUrl.isNotEmpty
+                            ? Image.network(imageUrl, fit: BoxFit.cover)
+                            : Image.asset('assets/images/movieimage.png',fit: BoxFit.cover,)
                       ),
                     ),
-
                   );
                 },
               ),
+
               const SizedBox(height: 100),
             ],
           ),
@@ -320,7 +338,9 @@ class _HomeScreenState extends State<HomeScreen> {
             _buildNavIcon(LucideIcons.download, 1),
             FloatingActionButton(
               backgroundColor: Colors.blueAccent,
-              onPressed: () {},
+              onPressed: () {
+
+              },
               child: const Icon(Icons.auto_awesome_motion),
             ),
             _buildNavIcon(LucideIcons.bookmark, 2),
@@ -388,16 +408,17 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildNavIcon(IconData icon, int index) {
-    return IconButton(
-      icon: Icon(icon,
-          color: _selectedNavIndex == index
-              ? Colors.white
-              : Colors.white.withOpacity(0.6)),
-      onPressed: () {
-        setState(() {
-          _selectedNavIndex = index;
-        });
-      },
-    );
+    return Consumer<ShowProvider>(builder: (context,value, child){
+
+      return IconButton(
+        icon: Icon(icon,
+            color: value.selectedNavIcon == index
+                ? Colors.white
+                : Colors.white.withOpacity(0.6)),
+        onPressed: () {
+          value.setSelectedNavIcon(index);
+        },
+      );
+    });
   }
 }

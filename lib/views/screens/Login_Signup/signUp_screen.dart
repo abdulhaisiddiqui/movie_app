@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../services/firebase_auth_service.dart';
-import '../../widgets/UiHelper.dart';
+import 'package:myapp/core/widgets/UiHelper.dart';
 import 'login_screen.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -24,11 +24,11 @@ class _SignupScreenState extends State<SignupScreen> {
 
 
     bool isLoading = false;
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // 🔹 Background Movie Collage
           Container(
             width: double.infinity,
             height: double.infinity,
@@ -186,6 +186,14 @@ class _SignupScreenState extends State<SignupScreen> {
                               width: double.infinity,
                               height: 50,
                               child: ElevatedButton(
+                                onPressed: authVM.isLoading
+                                    ? null
+                                    : () async {
+
+                                  await authVM.signUp(username: usernameController.text.trim(), email: emailController.text.trim(), password: passwordController.text.trim(), cnfPassword: cnfpasswordController.text.trim(), context: context);
+
+
+                                },
                                 style:
                                     ElevatedButton.styleFrom(
                                       padding: EdgeInsets.zero,
@@ -200,17 +208,9 @@ class _SignupScreenState extends State<SignupScreen> {
                                         Colors.transparent,
                                       ),
                                     ),
-                                onPressed: isLoading
-                                    ? null // Disable button while loading
-                                    : () async {
-                                  setState(() => isLoading = true);
 
-                                  await authVM.signUp(username: usernameController.text.trim(), email: emailController.text.trim(), password: passwordController.text.trim(), cnfPassword: cnfpasswordController.text.trim(), context: context);
-
-                                  setState(() => isLoading = false);
-                                },
-                                  child: isLoading
-                                      ? const SizedBox(
+                                  child: authVM.isLoading
+                                      ?  SizedBox(
                                     width: 25,
                                     height: 25,
                                     child: CircularProgressIndicator(
