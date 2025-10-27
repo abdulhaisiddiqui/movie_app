@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:myapp/core/utils/validators.dart';
+import 'package:myapp/models/signup_model.dart';
 import 'package:myapp/views/screens/Home/home_screen.dart';
 import 'package:myapp/views/screens/Login_Signup/login_screen.dart';
 import 'package:myapp/core/utils/validators.dart';
@@ -31,11 +32,11 @@ class FirebaseAuthService extends ChangeNotifier {
         email: email,
         password: password,
       );
-
+SignupModel signupModel =SignupModel(username: username, email: email, password: password, cnfPassword: cnfPassword);
       await _firestore.collection("users").doc(userCredential.user!.uid).set({
         "uid": userCredential.user!.uid,
-        "username": username,
-        "email": email,
+        "username": signupModel.username,
+        "email": signupModel.email,
         "createdAt": DateTime.now(),
       });
 

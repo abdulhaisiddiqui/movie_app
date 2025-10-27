@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:myapp/core/routes/app_routes.dart';
 import 'package:myapp/services/firebase_auth_service.dart';
 import 'package:myapp/views/screens/OnBoarding/onBoarding_screen.dart';
 import 'package:myapp/viewmodels/providers/show_provider.dart';
@@ -31,7 +32,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: OnBoardingScreen(),
+      initialRoute: AppRoutes.onboarding,
+      onGenerateRoute: AppRoutes.generateRoute,
     );
   }
 }

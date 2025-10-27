@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/core/routes/app_routes.dart';
 import 'package:myapp/services/firebase_auth_service.dart';
 import 'package:myapp/views/screens/Login_Signup/signup_screen.dart';
 import 'package:myapp/core/widgets/UiHelper.dart';
@@ -205,12 +206,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             SizedBox(height: 5),
                             TextButton(
                               onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => SignupScreen(),
-                                  ),
-                                );
+                                Navigator.pushNamed(context, AppRoutes.signup);
                               },
                               child: UiHelper.CustomText(
                                 text: 'Create an account? Sign up',

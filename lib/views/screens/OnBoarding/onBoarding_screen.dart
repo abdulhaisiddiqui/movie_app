@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:myapp/core/routes/app_routes.dart';
 import 'package:myapp/views/screens/Login_Signup/login_screen.dart';
 
 import '../../../core/widgets/UiHelper.dart';
@@ -149,12 +150,7 @@ class OnBoardingScreen extends StatelessWidget {
                                       ),
                                     ),
                                 onPressed: () {
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => const LoginScreen(),
-                                    ),
-                                  );
+                                  Navigator.pushReplacementNamed(context, AppRoutes.login);
                                 },
                                 child: UiHelper.CustomButtons(
                                   text: "Login & Subscribe",

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class UiHelper{
-
+//TODO: Name of the function should be camel case
   static CustomImage({required String img}) {
     return Image.asset("assets/images/$img");
   }

@@ -16,10 +16,13 @@ class ShowProvider with ChangeNotifier {
   bool get isLike => _isLike;
   List<ShowModel> get filteredShows => _filteredShows;
 
-
+set isLoading(bool value){
+  _isLoading = value;
+  notifyListeners();
+}
   Future<void> fetchShows() async {
-    _isLoading = true;
-    notifyListeners();
+    isLoading = true;
+
     try {
       final data = await ApiService.fetchShows();
       _shows = data;

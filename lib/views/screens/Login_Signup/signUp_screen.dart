@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/core/routes/app_routes.dart';
 import 'package:provider/provider.dart';
 
 import '../../../services/firebase_auth_service.dart';
@@ -22,8 +23,6 @@ class _SignupScreenState extends State<SignupScreen> {
 
     final authVM = Provider.of<FirebaseAuthService>(context,listen: false);
 
-
-    bool isLoading = false;
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -225,12 +224,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           SizedBox(height: 5),
                           TextButton(
                             onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => LoginScreen(),
-                                ),
-                              );
+                              Navigator.pushNamed(context, AppRoutes.login);
                             },
                             child: UiHelper.CustomText(
                               text: 'Already have account? Login',
