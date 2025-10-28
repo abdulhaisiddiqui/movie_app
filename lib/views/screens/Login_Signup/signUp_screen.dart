@@ -21,7 +21,8 @@ class _SignupScreenState extends State<SignupScreen> {
     final TextEditingController passwordController = TextEditingController();
     final TextEditingController cnfpasswordController = TextEditingController();
 
-    final authVM = Provider.of<FirebaseAuthService>(context,listen: false);
+
+
 
 
     return Scaffold(
@@ -179,34 +180,35 @@ class _SignupScreenState extends State<SignupScreen> {
 
                           const SizedBox(height: 40),
 
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 25),
-                            child: SizedBox(
-                              width: double.infinity,
-                              height: 50,
-                              child: ElevatedButton(
-                                onPressed: authVM.isLoading
-                                    ? null
-                                    : () async {
+                          Consumer<FirebaseAuthService>(builder: (context,authVM,child){
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 25),
+                              child: SizedBox(
+                                width: double.infinity,
+                                height: 50,
+                                child: ElevatedButton(
+                                  onPressed: authVM.isLoading
+                                      ? null
+                                      : () async {
 
-                                  await authVM.signUp(username: usernameController.text.trim(), email: emailController.text.trim(), password: passwordController.text.trim(), cnfPassword: cnfpasswordController.text.trim(), context: context);
+                                    await authVM.signUp(username: usernameController.text.trim(), email: emailController.text.trim(), password: passwordController.text.trim(), cnfPassword: cnfpasswordController.text.trim(), context: context);
 
 
-                                },
-                                style:
-                                    ElevatedButton.styleFrom(
-                                      padding: EdgeInsets.zero,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                    ).copyWith(
-                                      backgroundColor: WidgetStateProperty.all(
-                                        Colors.transparent,
-                                      ),
-                                      shadowColor: WidgetStateProperty.all(
-                                        Colors.transparent,
-                                      ),
+                                  },
+                                  style:
+                                  ElevatedButton.styleFrom(
+                                    padding: EdgeInsets.zero,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
                                     ),
+                                  ).copyWith(
+                                    backgroundColor: WidgetStateProperty.all(
+                                      Colors.transparent,
+                                    ),
+                                    shadowColor: WidgetStateProperty.all(
+                                      Colors.transparent,
+                                    ),
+                                  ),
 
                                   child: authVM.isLoading
                                       ?  SizedBox(
@@ -218,9 +220,10 @@ class _SignupScreenState extends State<SignupScreen> {
                                     ),
                                   )
                                       : UiHelper.CustomButtons(text: "Sign Up"),
+                                ),
                               ),
-                            ),
-                          ),
+                            );
+                          }),
                           SizedBox(height: 5),
                           TextButton(
                             onPressed: () {

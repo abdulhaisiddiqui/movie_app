@@ -71,6 +71,7 @@ flutter:
     - assets/images/backgroundImg.png
     - assets/images/streamifyLogo.png
     - assets/images/movieimage.png
+    - assets/images/appLogo.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

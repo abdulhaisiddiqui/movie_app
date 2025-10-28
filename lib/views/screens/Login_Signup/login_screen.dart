@@ -17,9 +17,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final TextEditingController emailController = TextEditingController();
     final TextEditingController passwordController = TextEditingController();
 
-    final authVM = Provider.of<FirebaseAuthService>(context, listen: false);
 
-    bool isLoading = false;
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
@@ -159,50 +157,49 @@ class _LoginScreenState extends State<LoginScreen> {
 
                             const SizedBox(height: 40),
                             // Login Button
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 25),
-                              child: SizedBox(
-                                width: double.infinity,
-                                height: 50,
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    padding: EdgeInsets.zero,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                  ).copyWith(
-                                    backgroundColor: WidgetStateProperty.all(Colors.transparent),
-                                    shadowColor: WidgetStateProperty.all(Colors.transparent),
-                                  ),
-                                  onPressed: isLoading
-                                      ? null
-                                      : () async {
-                                    setState(() => isLoading = true);
-
-                                    await authVM.signIn(
-                                      context,
-                                      emailController.text.trim(),
-                                      passwordController.text.trim(),
-                                    );
-
-                                    setState(() => isLoading = false);
-                                  },
-                                  child: isLoading
-                                      ? const SizedBox(
-                                    width: 25,
-                                    height: 25,
-                                    child: Center(
-                                      child: CircularProgressIndicator(
-                                        color: Colors.pink,
-                                        strokeWidth: 3,
+                            Consumer<FirebaseAuthService>(builder: (context ,authVM,child){
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 25),
+                                child: SizedBox(
+                                  width: double.infinity,
+                                  height: 50,
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      padding: EdgeInsets.zero,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
                                       ),
+                                    ).copyWith(
+                                      backgroundColor: WidgetStateProperty.all(Colors.transparent),
+                                      shadowColor: WidgetStateProperty.all(Colors.transparent),
                                     ),
-                                  )
-                                      : UiHelper.CustomButtons(text: "Login"),
-                                ),
-                              ),
-                            ),
+                                    onPressed: authVM.isLoading
+                                        ? null
+                                        : () async {
 
+                                      await authVM.signIn(
+                                        context,
+                                        emailController.text.trim(),
+                                        passwordController.text.trim(),
+                                      );
+
+                                    },
+                                    child: authVM.isLoading
+                                        ? const SizedBox(
+                                      width: 25,
+                                      height: 25,
+                                      child: Center(
+                                        child: CircularProgressIndicator(
+                                          color: Colors.pink,
+                                          strokeWidth: 3,
+                                        ),
+                                      ),
+                                    )
+                                        : UiHelper.CustomButtons(text: "Login"),
+                                  ),
+                                ),
+                              );
+                            }),
                             SizedBox(height: 5),
                             TextButton(
                               onPressed: () {

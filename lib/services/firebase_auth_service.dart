@@ -15,6 +15,10 @@ class FirebaseAuthService extends ChangeNotifier {
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
+  set isLoading(bool value){
+    _isLoading = value;
+    notifyListeners();
+  }
 
   Future<void> signUp({required String username, required String email, required String password, required String cnfPassword, required BuildContext context,}) async {
     final passwordError = Validators.validatePassword(username, email, password, cnfPassword);
@@ -24,8 +28,8 @@ class FirebaseAuthService extends ChangeNotifier {
       return;
     }
 
-    _isLoading = true;
-    notifyListeners();
+    isLoading = true;
+
 
     try {
       UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
@@ -50,12 +54,13 @@ SignupModel signupModel =SignupModel(username: username, email: email, password:
     } catch (e) {
       _showSnackBar(context, "Something went wrong: $e");
     } finally {
-      _isLoading = false;
+      isLoading = false;
       notifyListeners();
     }
   }
 
   Future<void> signIn(BuildContext context, String email, String password) async {
+
     if (email.isEmpty || password.isEmpty) {
       _showSnackBar(context, 'All fields are required!');
       return;
@@ -76,10 +81,12 @@ SignupModel signupModel =SignupModel(username: username, email: email, password:
       final errorMessage = SigninValidators.getErrorMessage(e.code);
 
         _showSnackBar(context, errorMessage);
+      isLoading = true;
 
     } catch (e) {
       print("Login error: $e");
     }
+    isLoading = false;
   }
 
   Future<void> logout(BuildContext context) async {

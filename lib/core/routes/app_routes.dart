@@ -5,8 +5,10 @@ import 'package:myapp/views/screens/OnBoarding/onBoarding_screen.dart';
 
 import 'package:myapp/views/screens/home/home_screen.dart';
 import 'package:myapp/views/screens/specific/specific_screen.dart';
+import 'package:myapp/views/screens/splash/splash_screen.dart';
 
 class AppRoutes {
+  static const String splash = '/';
   static const String login = '/login';
   static const String signup = '/signup';
   static const String home = '/home';
@@ -14,6 +16,8 @@ class AppRoutes {
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
+      case splash:
+        return MaterialPageRoute(builder: (_) => const SplashScreen());
       case login:
         return MaterialPageRoute(builder: (_) => const LoginScreen());
       case signup:
