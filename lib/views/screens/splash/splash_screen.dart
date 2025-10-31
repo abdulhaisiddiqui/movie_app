@@ -85,13 +85,13 @@ class _SplashScreenState extends State<SplashScreen> {
                   ),
                 ),
 
-                // 🔹 Content
+
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const SizedBox(height: 100),
 
-                    // 🟣 Title with Logo
+
                     Padding(
                       padding: const EdgeInsets.only(left: 30),
                       child: Stack(

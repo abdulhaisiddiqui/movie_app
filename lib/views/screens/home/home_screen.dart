@@ -48,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Icon(Icons.menu, color: Colors.white, size: 28),
+                  IconButton(onPressed: (){}, icon: Icon(Icons.menu, color: Colors.white, size: 28)),
 
                   const CircleAvatar(
                     radius: 18,
